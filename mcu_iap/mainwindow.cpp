@@ -63,12 +63,6 @@ MainWindow::~MainWindow()
 {
     save_windows_parm();
 
-    if (file && file->isOpen())
-    {
-        file->close();
-    }
-    delete file;
-
     delete ui;
 }
 
