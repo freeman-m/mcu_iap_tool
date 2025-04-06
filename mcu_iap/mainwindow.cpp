@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_start_updata->setEnabled(false);
 
     // 隐藏部分控件
-    ui->frame->setHidden(true);
+    ui->frame->setHidden(false);
 }
 
 MainWindow::~MainWindow()
@@ -160,6 +160,10 @@ void MainWindow::on_pushButton_select_file_clicked()
 
         fileSize = file->size();
         fileData = file->readAll();
+        bin_crc = static_cast<quint8>(fileData.at(fileData.size() - 2)) |
+                (static_cast<quint8>(fileData.at(fileData.size() - 1)) << 8);
+        qDebug("filesize: %d, bin_crc: 0x%04x.", fileSize, bin_crc);
+
         bytesWritten = 0;
         ui->progressBar->setMaximum(fileSize);
         ui->progressBar->setValue(0);
