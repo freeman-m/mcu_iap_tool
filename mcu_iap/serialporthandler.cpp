@@ -90,9 +90,12 @@ bool SerialPortHandler::sendData(const QByteArray &data)
 void SerialPortHandler::handleReadyRead()
 {
     static QByteArray buffer;
+    QByteArray readBuffer = serialPort->readAll();
+
+    emit dataReceivedStr(readBuffer);
 
     // 读取所有数据
-    buffer.append(serialPort->readAll());
+    buffer.append(readBuffer);
 
     while(buffer.size() >= 14)
     {

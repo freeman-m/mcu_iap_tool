@@ -31,6 +31,7 @@ public:
 private slots:
     void onTimeout(); // 定时器超时槽函数
 
+    void onDataReceivedStr(const QByteArray &data);
     void onDataReceived(const QByteArray &data);
     void handleSerialPortError(const QString &error);
 
@@ -51,6 +52,14 @@ private slots:
     void on_pushButton_reset_mcu_2_clicked();
 
     void on_pushButton_set_unixtime_clicked();
+
+    void on_pushButton_calculate_coeff_clicked();
+
+    void on_pushButton_set_calib_clicked();
+
+    void on_pushButton_read_calib_clicked();
+
+    void on_pushButton_log_clear_clicked();
 
 private:
     Ui::MainWindow *ui;

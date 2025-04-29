@@ -17,6 +17,9 @@ public:
     // 解包数据
     QByteArray unpackData(const QByteArray &packet);
 
+    // 计算crc16_modbus
+    uint16_t crc16_modbus(const uint8_t *p_buff, uint32_t len);
+
 private:
     // 计算crc16
     uint16_t crc16(const uint8_t *p_buff, uint32_t len);

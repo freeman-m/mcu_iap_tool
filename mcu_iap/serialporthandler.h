@@ -35,21 +35,24 @@ public:
 
     QSerialPort *serialPort;
 
+    DataProtocol *dataProtocol; // 协议处理对象
+
 signals:
     // 串口错误信号
     void errorOccurred(const QString &error);
 
     // 接收到数据
     void dataReceived(const QByteArray &data);
+    // 其它数据
+    void dataReceivedStr(const QByteArray &data);
 
 private slots:
     // 处理串口接收到的数据
     void handleReadyRead();
 
 private:
-//    QSerialPort *serialPort;
 
-    DataProtocol *dataProtocol; // 协议处理对象
+
 };
 
 #endif // SERIALPORTHANDLER_H

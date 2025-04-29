@@ -10,6 +10,8 @@
 
 #include <cstring>
 
+#include <QDateTime>
+
 uint8_t index=0;
 
 // 配置文件保存
@@ -17,8 +19,12 @@ void MainWindow::save_windows_parm()
 {
     qDebug("%s", __func__);
 
-    settings->setValue("serial1/com", ui->comboBox_port->currentText());
-    settings->setValue("serial1/baudrate", ui->comboBox_baudrate->currentText());
+    settings->setValue("serial/com", ui->comboBox_port->currentText());
+    settings->setValue("serial/baudrate", ui->comboBox_baudrate->currentText());
+
+    settings->setValue("file/path", ui->lineEdit_bin_path->text());
+
+    settings->setValue("coeff/value", ui->lineEdit_pulse_voltage->text());
 
     settings->sync();
 }
@@ -30,8 +36,20 @@ void MainWindow::read_windows_parm()
     settings = new QSettings("setting.ini",QSettings::IniFormat);
     qDebug() << QCoreApplication::applicationDirPath();
 
-    ui->comboBox_port->addItem(settings->value("serial1/com").toString());
-    ui->comboBox_baudrate->setCurrentText(settings->value("serial1/baudrate").toString());
+    ui->comboBox_port->addItem(settings->value("serial/com").toString());
+    ui->comboBox_baudrate->setCurrentText(settings->value("serial/baudrate").toString());
+
+    QString savedPath = settings->value("file/path", "").toString();
+    if (!savedPath.isEmpty())
+    {
+        ui->lineEdit_bin_path->setText(savedPath);
+    }
+
+    QString readString = settings->value("coeff/value", "").toString();
+    if (!savedPath.isEmpty())
+    {
+        ui->lineEdit_pulse_voltage->setText(readString);
+    }
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -50,13 +68,18 @@ MainWindow::MainWindow(QWidget *parent) :
     read_windows_parm();
 
     connect(serialPortHandler, &SerialPortHandler::dataReceived, this, &MainWindow::onDataReceived);
+    connect(serialPortHandler, &SerialPortHandler::dataReceivedStr, this, &MainWindow::onDataReceivedStr);
     // 连接串口错误信号
     connect(serialPortHandler, &SerialPortHandler::errorOccurred, this, &MainWindow::handleSerialPortError);
 
     ui->pushButton_start_updata->setEnabled(false);
 
+    ui->lineEdit_coeff->setReadOnly(true);  // 设置为只读，用户不可编辑
+
     // 隐藏部分控件
     ui->frame->setHidden(false);
+
+    ui->pushButton_set_unixtime->setHidden(true);
 }
 
 MainWindow::~MainWindow()
@@ -138,7 +161,7 @@ void MainWindow::on_pushButton_select_file_clicked()
     QString filePath = QFileDialog::getOpenFileName(
         this,                               // 父窗口
         "选择 BIN 文件",                    // 对话框标题
-        "",                                 // 默认打开路径（空字符串表示当前目录）
+        ui->lineEdit_bin_path->text().isEmpty() ? "QDir::homePath()" : ui->lineEdit_bin_path->text(),           //"",                                 // 默认打开路径（空字符串表示当前目录）
         "BIN 文件 (*.bin);;所有文件 (*)"     // 文件过滤器
     );
 
@@ -375,10 +398,37 @@ void MainWindow::onDataReceived(const QByteArray &data)
                 on_pushButton_reset_mcu_clicked();
             }
             break;
+    }
+}
 
+void MainWindow::onDataReceivedStr(const QByteArray &data)
+{
+    QString displayText;
+
+    // 获取当前时间
+    QString timestamp = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz] ");
+    displayText += timestamp;
+
+    for (char c : data)
+    {
+        // 可打印ASCII字符 (32-126)
+        if (c >= 32 && c <= 126) {
+            displayText += c;
+        }
+        // 处理特殊字符
+        else {
+            switch(c) {
+                case '\n': displayText += "\\n"; break;
+                case '\r': displayText += "\\r"; break;
+                case '\t': displayText += "\\t"; break;
+                default:
+                    // 其他非打印字符显示为十六进制
+                    displayText += QString("\\x%1").arg((quint8)c, 2, 16, QLatin1Char('0'));
+            }
+        }
     }
 
-
+    ui->textEdit->append(displayText);
 }
 
 
@@ -454,10 +504,98 @@ void MainWindow::on_pushButton_reset_mcu_2_clicked()
 
 void MainWindow::on_pushButton_set_unixtime_clicked()
 {
-    iap_tx_packet.cmd = D_IAP_CMD_GET_DEVICE_INFO;
-    iap_tx_packet.type = 0xFF;
-    iap_tx_packet.parm1 = 0;
-    iap_tx_packet.parm2 = 0;
+//    iap_tx_packet.cmd = D_IAP_CMD_GET_DEVICE_INFO;
+//    iap_tx_packet.type = 0xFF;
+//    iap_tx_packet.parm1 = 0;
+//    iap_tx_packet.parm2 = 0;
 
-    data_send_proc(QByteArray(), 0, 200);
+//    data_send_proc(QByteArray(), 0, 200);
+}
+
+void MainWindow::on_pushButton_calculate_coeff_clicked()
+{
+    if (ui->lineEdit_pulse_voltage->text().isEmpty())
+    {
+        QMessageBox::critical(this, "错误", "请输入实测脉冲电压值");
+    }
+
+    QString text = ui->lineEdit_pulse_voltage->text();
+    bool conver_ok;
+    float pulse_voltage = text.toFloat(&conver_ok);
+
+    if ((pulse_voltage > 3.0)|| (pulse_voltage < 1.0))
+    {
+        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
+    }
+    else if (conver_ok)
+    {
+        // 转换OK
+        float coeff = 2.0/pulse_voltage;
+        ui->lineEdit_coeff->setText(QString::number(coeff, 'f', 3));
+    }
+    else
+    {
+        // 转换失败，显示错误提示
+        QMessageBox::critical(this, "错误", "请输入有效的脉冲电压值");
+    }
+}
+
+void MainWindow::on_pushButton_set_calib_clicked()
+{
+    if (ui->lineEdit_coeff->text().isEmpty())
+    {
+        QMessageBox::critical(this, "错误", "请先计算coeff系数");
+    }
+    else if (!serialPortHandler->isPortOpen())
+    {
+        QMessageBox::critical(this, "错误", "请先打开串口");
+    }
+    else
+    {
+        // 给定的数组
+        unsigned char data[] = {0x55, 0xDB, 0x01, 0x00, 0x01, 0x01, 0xFF, 0xFF, 0x0C, 0xCC, 0xCC, 0x0D, 0x0A};
+
+        uint16_t temp;
+        temp = ui->lineEdit_coeff->text().toFloat() * 1000;
+        data[6] = (temp >> 8);
+        data[7] = (temp);
+
+        data[9] = (serialPortHandler->dataProtocol->crc16_modbus(data, 9) >> 8);
+        data[10] = (serialPortHandler->dataProtocol->crc16_modbus(data, 9) );
+
+        // 计算数组的长度
+        int length = sizeof(data) / sizeof(data[0]);
+
+        // 将数组转换为 QByteArray
+        QByteArray byteArray(reinterpret_cast<const char*>(data), length);
+        qDebug() << "QByteArray content will send hex: " << byteArray.toHex().toUpper();
+        serialPortHandler->serialPort->write(byteArray);
+    }
+}
+
+
+void MainWindow::on_pushButton_read_calib_clicked()
+{
+    if (serialPortHandler->isPortOpen())
+    {
+        // 给定的数组
+        unsigned char data[] = {0x55, 0xDB, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x0B, 0x77, 0xE8, 0x0D, 0x0A};
+
+        // 计算数组的长度
+        int length = sizeof(data) / sizeof(data[0]);
+
+        // 将数组转换为 QByteArray
+        QByteArray byteArray(reinterpret_cast<const char*>(data), length);
+        qDebug() << "QByteArray content will send hex: " << byteArray.toHex().toUpper();
+        serialPortHandler->serialPort->write(byteArray);
+    }
+    else
+    {
+        QMessageBox::critical(this, "错误", "请先打开串口");
+    }
+}
+
+void MainWindow::on_pushButton_log_clear_clicked()
+{
+    ui->textEdit->clear();
 }
