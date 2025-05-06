@@ -61,6 +61,10 @@ private slots:
 
     void on_pushButton_log_clear_clicked();
 
+    void on_pushButton_get_info_clicked();
+
+    void on_actionAbout_triggered();
+
 private:
     Ui::MainWindow *ui;
     SerialPortHandler *serialPortHandler;

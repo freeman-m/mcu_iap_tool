@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MCU_IAP</string>
+   <string>WONZ_Tools</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="label">
@@ -482,8 +482,25 @@
      <string>IAP升级</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_get_info">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>204</y>
+      <width>151</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>获取设备信息</string>
+    </property>
+   </widget>
    <zorder>groupBox_3</zorder>
-   <zorder>frame</zorder>
    <zorder>groupBox</zorder>
    <zorder>label</zorder>
    <zorder>label_2</zorder>
@@ -500,6 +517,8 @@
    <zorder>pushButton_connect_mcu</zorder>
    <zorder>pushButton_reset_mcu_2</zorder>
    <zorder>pushButton_log_clear</zorder>
+   <zorder>frame</zorder>
+   <zorder>pushButton_get_info</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -510,7 +529,19 @@
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

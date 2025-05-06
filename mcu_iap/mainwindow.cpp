@@ -403,11 +403,22 @@ void MainWindow::onDataReceived(const QByteArray &data)
 
 void MainWindow::onDataReceivedStr(const QByteArray &data)
 {
+    static int64_t last_timestampMs=0;
+    int64_t timestampMs;
+
     QString displayText;
 
     // 获取当前时间
-    QString timestamp = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz] ");
-    displayText += timestamp;
+    timestampMs = QDateTime::currentMSecsSinceEpoch();
+    qDebug() << "当前时间戳(毫秒):" << timestampMs;
+
+    QString timestamp = QDateTime::currentDateTime().toString("[====hh:mm:ss.zzz====] ");
+    if ((timestampMs - last_timestampMs) > 100)
+    {
+        displayText += "\r";
+        displayText += timestamp;
+        displayText += "\r";
+    }
 
     for (char c : data)
     {
@@ -418,17 +429,27 @@ void MainWindow::onDataReceivedStr(const QByteArray &data)
         // 处理特殊字符
         else {
             switch(c) {
-                case '\n': displayText += "\\n"; break;
-                case '\r': displayText += "\\r"; break;
-                case '\t': displayText += "\\t"; break;
-                default:
-                    // 其他非打印字符显示为十六进制
-                    displayText += QString("\\x%1").arg((quint8)c, 2, 16, QLatin1Char('0'));
+            case '\n':
+//                displayText += "\n";
+                break;
+
+            case '\r':
+                displayText += "\r";
+                break;
+
+            case '\t':
+                displayText += "\t";
+                break;
+            default:
+                // 其他非打印字符显示为十六进制
+                displayText += QString("\\x%1").arg((quint8)c, 2, 16, QLatin1Char('0'));
             }
         }
     }
 
     ui->textEdit->append(displayText);
+
+    last_timestampMs = timestampMs;
 }
 
 
@@ -581,7 +602,7 @@ void MainWindow::on_pushButton_read_calib_clicked()
         // 给定的数组
         unsigned char data[] = {0x55, 0xDB, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x0B, 0x77, 0xE8, 0x0D, 0x0A};
 
-        // 计算数组的长度
+        // 计算数组的长度QT
         int length = sizeof(data) / sizeof(data[0]);
 
         // 将数组转换为 QByteArray
@@ -598,4 +619,26 @@ void MainWindow::on_pushButton_read_calib_clicked()
 void MainWindow::on_pushButton_log_clear_clicked()
 {
     ui->textEdit->clear();
+}
+
+void MainWindow::on_pushButton_get_info_clicked()
+{
+    if (serialPortHandler->isPortOpen())
+    {
+        // 给定的字符串
+        QString data = "get info\r\n";
+        QByteArray byteArray = data.toUtf8();
+
+        serialPortHandler->serialPort->write(byteArray);
+    }
+    else
+    {
+        QMessageBox::critical(this, "错误", "请先打开串口");
+    }
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QString version = "V0.1_20250506";
+    QMessageBox::information(this, "版本信息", QString("当前版本：%1").arg(version));
 }
