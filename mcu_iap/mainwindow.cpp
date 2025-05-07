@@ -207,7 +207,7 @@ void MainWindow::on_pushButton_select_file_clicked()
 #define	D_IAP_CMD_GET_IAP_DATA_CRC		0x23
 #define	D_IAP_CMD_SEND_CRC_RESULT		0x24
 
-#define D_IAP_BIN_PACKET_LEN            1024LL    // bin分包传输大小
+#define D_IAP_BIN_PACKET_LEN            2048LL    // bin分包传输大小
 
 // 回复上位机
 typedef struct
@@ -368,7 +368,7 @@ void MainWindow::onDataReceived(const QByteArray &data)
                 else
                 {
                     curr_bin_packet.bin_index ++;
-                    curr_bin_packet.bin_size = qMin(1024LL, fileSize - bytesWritten);
+                    curr_bin_packet.bin_size = qMin(D_IAP_BIN_PACKET_LEN, fileSize - bytesWritten);
 
                     chunk = fileData.mid(bytesWritten, curr_bin_packet.bin_size);
 
