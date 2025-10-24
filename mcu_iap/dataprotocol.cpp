@@ -37,7 +37,7 @@ QByteArray DataProtocol::packData(const QByteArray &data)
     packet.append(static_cast<char>(cal_crc & 0xFF));
     packet.append(static_cast<char>((cal_crc >> 8) & 0xFF));
 
-    qDebug() << "QByteArray content will send hex: " << packet.toHex().toUpper();
+//    qDebug() << "QByteArray content will send hex: " << packet.toHex().toUpper();
 
     return packet;
 }

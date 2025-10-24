@@ -80,6 +80,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->frame->setHidden(false);
 
     ui->pushButton_set_unixtime->setHidden(true);
+
+    ui->pushButton_reset_mcu->setHidden(true);
 }
 
 MainWindow::~MainWindow()
@@ -521,6 +523,10 @@ void MainWindow::on_pushButton_reset_mcu_2_clicked()
 //    data_send_proc(byteArray, 0, 200);
     qDebug() << "QByteArray content will send hex: " << byteArray.toHex().toUpper();
     serialPortHandler->serialPort->write(byteArray);
+
+    // 将按钮状态复位
+    ui->pushButton_start_updata->setEnabled(false);
+    ui->pushButton_connect_mcu->setText("开始连接");
 }
 
 void MainWindow::on_pushButton_set_unixtime_clicked()
@@ -544,14 +550,14 @@ void MainWindow::on_pushButton_calculate_coeff_clicked()
     bool conver_ok;
     float pulse_voltage = text.toFloat(&conver_ok);
 
-    if ((pulse_voltage > 3.0)|| (pulse_voltage < 1.0))
+    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
     {
         QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
     }
     else if (conver_ok)
     {
         // 转换OK
-        float coeff = 2.0/pulse_voltage;
+        float coeff = 7.5/pulse_voltage;
         ui->lineEdit_coeff->setText(QString::number(coeff, 'f', 3));
     }
     else
@@ -639,6 +645,6 @@ void MainWindow::on_pushButton_get_info_clicked()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QString version = "V0.1_20250506";
+    QString version = "V0.1_20251024";
     QMessageBox::information(this, "版本信息", QString("当前版本：%1").arg(version));
 }
