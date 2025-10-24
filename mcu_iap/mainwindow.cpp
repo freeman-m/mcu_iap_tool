@@ -539,8 +539,23 @@ void MainWindow::on_pushButton_set_unixtime_clicked()
 //    data_send_proc(QByteArray(), 0, 200);
 }
 
-void MainWindow::on_pushButton_calculate_coeff_clicked()
+void MainWindow::on_pushButton_coeff_init_clicked()
 {
+    // 给定的数组
+    unsigned char data[] = {0x55, 0xDB, 0x01, 0x00, 0x01, 0x01, 0x03, 0xE8, 0x0C, 0xB5, 0x17, 0x0D, 0x0A};
+
+    // 计算数组的长度
+    int length = sizeof(data) / sizeof(data[0]);
+
+    // 将数组转换为 QByteArray
+    QByteArray byteArray(reinterpret_cast<const char*>(data), length);
+    qDebug() << "QByteArray content will send hex: " << byteArray.toHex().toUpper();
+    serialPortHandler->serialPort->write(byteArray);
+}
+
+void MainWindow::on_pushButton_set_calib_clicked()
+{
+    // 先计算出校准系数
     if (ui->lineEdit_pulse_voltage->text().isEmpty())
     {
         QMessageBox::critical(this, "错误", "请输入实测脉冲电压值");
@@ -565,10 +580,8 @@ void MainWindow::on_pushButton_calculate_coeff_clicked()
         // 转换失败，显示错误提示
         QMessageBox::critical(this, "错误", "请输入有效的脉冲电压值");
     }
-}
 
-void MainWindow::on_pushButton_set_calib_clicked()
-{
+    // 准备写入校准系数
     if (ui->lineEdit_coeff->text().isEmpty())
     {
         QMessageBox::critical(this, "错误", "请先计算coeff系数");

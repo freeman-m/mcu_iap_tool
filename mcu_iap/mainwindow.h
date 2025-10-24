@@ -53,8 +53,6 @@ private slots:
 
     void on_pushButton_set_unixtime_clicked();
 
-    void on_pushButton_calculate_coeff_clicked();
-
     void on_pushButton_set_calib_clicked();
 
     void on_pushButton_read_calib_clicked();
@@ -64,6 +62,8 @@ private slots:
     void on_pushButton_get_info_clicked();
 
     void on_actionAbout_triggered();
+
+    void on_pushButton_coeff_init_clicked();
 
 private:
     Ui::MainWindow *ui;

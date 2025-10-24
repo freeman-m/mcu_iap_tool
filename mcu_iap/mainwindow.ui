@@ -326,10 +326,10 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_calculate_coeff">
+     <widget class="QPushButton" name="pushButton_coeff_init">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>380</x>
         <y>20</y>
         <width>75</width>
         <height>50</height>
@@ -341,13 +341,13 @@
        </font>
       </property>
       <property name="text">
-       <string>计算系数</string>
+       <string>初始化系数</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_set_calib">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>160</x>
         <y>20</y>
         <width>101</width>
         <height>51</height>
@@ -365,7 +365,7 @@
      <widget class="QPushButton" name="pushButton_read_calib">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>270</x>
         <y>20</y>
         <width>101</width>
         <height>51</height>
