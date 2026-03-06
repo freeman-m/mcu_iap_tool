@@ -65,6 +65,8 @@ private slots:
 
     void on_pushButton_coeff_init_clicked();
 
+    void on_pushButton_set_calib_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     SerialPortHandler *serialPortHandler;

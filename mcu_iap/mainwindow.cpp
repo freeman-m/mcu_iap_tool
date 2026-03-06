@@ -450,6 +450,7 @@ void MainWindow::onDataReceivedStr(const QByteArray &data)
     }
 
     ui->textEdit->append(displayText);
+    ui->textEdit->moveCursor(QTextCursor::End);
 
     last_timestampMs = timestampMs;
 }
@@ -658,6 +659,66 @@ void MainWindow::on_pushButton_get_info_clicked()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QString version = "V0.1_20251024";
+    QString version = "V0.2_20260306";
     QMessageBox::information(this, "版本信息", QString("当前版本：%1").arg(version));
+}
+
+void MainWindow::on_pushButton_set_calib_2_clicked()
+{
+    // 先计算出校准系数
+    if (ui->lineEdit_pulse_voltage->text().isEmpty())
+    {
+        QMessageBox::critical(this, "错误", "请输入实测脉冲电压值");
+    }
+
+    QString text = ui->lineEdit_pulse_voltage->text();
+    bool conver_ok;
+    float pulse_voltage = text.toFloat(&conver_ok);
+
+    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
+    {
+        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
+    }
+    else if (conver_ok)
+    {
+        // 转换OK
+        float coeff = 7.5/pulse_voltage;
+        ui->lineEdit_coeff->setText(QString::number(coeff, 'f', 3));
+    }
+    else
+    {
+        // 转换失败，显示错误提示
+        QMessageBox::critical(this, "错误", "请输入有效的脉冲电压值");
+    }
+
+    // 准备写入校准系数
+    if (ui->lineEdit_coeff->text().isEmpty())
+    {
+        QMessageBox::critical(this, "错误", "请先计算coeff系数");
+    }
+    else if (!serialPortHandler->isPortOpen())
+    {
+        QMessageBox::critical(this, "错误", "请先打开串口");
+    }
+    else
+    {
+        // 给定的数组
+        unsigned char data[] = {0x55, 0xDB, 0x01, 0x00, 0x01, 0x01, 0xFF, 0xFF, 0x1C, 0xCC, 0xCC, 0x0D, 0x0A};
+
+        uint16_t temp;
+        temp = ui->lineEdit_coeff->text().toFloat() * 1000;
+        data[6] = (temp >> 8);
+        data[7] = (temp);
+
+        data[9] = (serialPortHandler->dataProtocol->crc16_modbus(data, 9) >> 8);
+        data[10] = (serialPortHandler->dataProtocol->crc16_modbus(data, 9) );
+
+        // 计算数组的长度
+        int length = sizeof(data) / sizeof(data[0]);
+
+        // 将数组转换为 QByteArray
+        QByteArray byteArray(reinterpret_cast<const char*>(data), length);
+        qDebug() << "QByteArray content will send hex: " << byteArray.toHex().toUpper();
+        serialPortHandler->serialPort->write(byteArray);
+    }
 }
