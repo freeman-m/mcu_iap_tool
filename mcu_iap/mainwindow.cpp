@@ -60,6 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // 设置全局字体大小，确保高DPI下所有控件字体一致
+    QFont defaultFont = this->font();
+    defaultFont.setPointSize(10);
+    this->setFont(defaultFont);
+
     // 初始化定时器
     timeoutTimer->setInterval(100); // 100ms 超时
     timeoutTimer->setSingleShot(true); // 单次触发
@@ -566,11 +571,12 @@ void MainWindow::on_pushButton_set_calib_clicked()
     bool conver_ok;
     float pulse_voltage = text.toFloat(&conver_ok);
 
-    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
-    {
-        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
-    }
-    else if (conver_ok)
+//    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
+//    {
+//        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
+//    }
+//    else
+        if (conver_ok)
     {
         // 转换OK
         float coeff = 7.5/pulse_voltage;
@@ -675,11 +681,12 @@ void MainWindow::on_pushButton_set_calib_2_clicked()
     bool conver_ok;
     float pulse_voltage = text.toFloat(&conver_ok);
 
-    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
-    {
-        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
-    }
-    else if (conver_ok)
+//    if ((pulse_voltage > 10.0)|| (pulse_voltage < 4.0))
+//    {
+//        QMessageBox::critical(this, "错误", "请输入正确的脉冲电压值");
+//    }
+//    else
+        if (conver_ok)
     {
         // 转换OK
         float coeff = 7.5/pulse_voltage;
