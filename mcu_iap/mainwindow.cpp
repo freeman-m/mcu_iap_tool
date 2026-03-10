@@ -449,8 +449,8 @@ void MainWindow::onDataReceivedStr(const QByteArray &data)
         }
     }
 
-    ui->textEdit->append(displayText);
     ui->textEdit->moveCursor(QTextCursor::End);
+    ui->textEdit->insertPlainText(displayText);
 
     last_timestampMs = timestampMs;
 }
