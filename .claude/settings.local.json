@@ -4,7 +4,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(gh api repos/etiktin/generate-evb/contents/templates --jq '.[].name')",
-      "Bash(where 7z)"
+      "Bash(where 7z)",
+      "Bash(wc -l /e/temp/QT/mcu_iap_tool/mcu_iap/*.cpp /e/temp/QT/mcu_iap_tool/mcu_iap/*.h)"
     ]
   }
 }

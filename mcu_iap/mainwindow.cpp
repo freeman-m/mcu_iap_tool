@@ -61,9 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // 设置全局字体大小，确保高DPI下所有控件字体一致
-    QFont defaultFont = this->font();
-    defaultFont.setPointSize(10);
-    this->setFont(defaultFont);
+//    QFont defaultFont = this->font();
+//    defaultFont.setPointSize(10);
+//    this->setFont(defaultFont);
 
     // 初始化定时器
     timeoutTimer->setInterval(100); // 100ms 超时
@@ -80,9 +80,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_start_updata->setEnabled(false);
 
     ui->lineEdit_coeff->setReadOnly(true);  // 设置为只读，用户不可编辑
-
-    // 隐藏部分控件
-    ui->frame->setHidden(false);
 
     ui->pushButton_set_unixtime->setHidden(true);
 
@@ -422,9 +419,8 @@ void MainWindow::onDataReceivedStr(const QByteArray &data)
     QString timestamp = QDateTime::currentDateTime().toString("[====hh:mm:ss.zzz====] ");
     if ((timestampMs - last_timestampMs) > 100)
     {
-        displayText += "\r";
+        displayText += "\n";
         displayText += timestamp;
-        displayText += "\r";
     }
 
     for (char c : data)
@@ -561,6 +557,8 @@ void MainWindow::on_pushButton_coeff_init_clicked()
 
 void MainWindow::on_pushButton_set_calib_clicked()
 {
+    ui->textEdit->clear();
+
     // 先计算出校准系数
     if (ui->lineEdit_pulse_voltage->text().isEmpty())
     {
