@@ -8,9 +8,9 @@ REM  生成单文件自解压 exe（WinRAR SFX）
 REM ============================================
 
 REM --- 配置路径（根据实际安装位置修改） ---
-set QT_DIR=D:\Qt\Qt5.6.2\5.6\mingw49_32
-set MINGW_DIR=D:\Qt\Qt5.6.2\Tools\mingw492_32
-set WINRAR="C:\Program Files\WinRAR\WinRAR.exe"
+set QT_DIR=D:\Qt\Qt5.14.2\5.14.2\mingw73_64
+set MINGW_DIR=D:\Qt\Qt5.14.2\Tools\mingw730_64
+set WINRAR="D:\Program Files\WinRAR\WinRAR.exe"
 set PROJECT_DIR=%~dp0mcu_iap
 set BUILD_DIR=%~dp0build_release
 set OUTPUT_DIR=%~dp0release_pack
@@ -92,7 +92,7 @@ del /f "%SFX_CFG%" 2>nul
 echo.
 echo ========================================
 echo   打包完成！
-echo   单文件输出: %SFX_EXE%
+echo   Output: %SFX_EXE%
 echo ========================================
 echo.
 pause
